@@ -2,8 +2,10 @@
 
 int main()
 {   
-	test::GrayChangeTest();
-
+	//test::GrayChangeTest();
+	test::SaltTest();
+	//test::SolidColorTest();
+	test::FilterTest();
 	return 0;
 
 }

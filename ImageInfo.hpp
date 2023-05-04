@@ -1,3 +1,5 @@
+#pragma once
+
 class ImageInfo{
     public:
      struct Color{float r,g,b;float a=1.0f;};
