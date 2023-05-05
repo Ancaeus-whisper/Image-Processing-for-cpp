@@ -4,6 +4,7 @@
 namespace image_lib
 {
     enum SketchColorMode{color,gray};
+    enum FleetColor{green,red,blue};//赋值这一步属于多此一举，仅作提醒作用
     /*
     功能：将图片变为毛玻璃特效
     约束：
@@ -143,4 +144,45 @@ namespace image_lib
         }
         return mask;
     }
+    /*
+    功能：基于经验公式的怀旧特效
+        B= 0.272 * r + 0.534 * g + 0.131 * b
+        G = 0.349 * r + 0.686 * g + 0.168 * b
+        R = 0.393 * r + 0.769 * g + 0.189 * b
+    */
+    cv::Mat Old(const cv::Mat &originImage)
+    {
+        cv::Mat output=originImage.clone();
+        for(int i=0;i<originImage.rows;i++)
+        {
+            for(int j=0;j<originImage.cols;j++)
+            {
+                float b=(double)originImage.at<cv::Vec3b>(i,j)[0];
+                float g=(double)originImage.at<cv::Vec3b>(i,j)[1];
+                float r=(double)originImage.at<cv::Vec3b>(i,j)[2];
+
+                float B=std::min( 0.272 * r + 0.534 * g + 0.131 * b,255.0);
+                float G=std::min( 0.349 * r + 0.686 * g + 0.168 * b,255.0);
+                float R=std::min( 0.393 * r + 0.769 * g + 0.189 * b,255.0);
+
+                output.at<cv::Vec3b>(i,j)[0]=(int)B;
+                output.at<cv::Vec3b>(i,j)[1]=(int)G;
+                output.at<cv::Vec3b>(i,j)[2]=(int)R;
+            }
+        }
+        return output;
+    }
+
+    cv::Mat Fleet(const cv::Mat &originImage,FleetColor channel=FleetColor::blue)
+    {
+        cv::Mat output=originImage.clone();
+        for(int i=0;i<originImage.rows;i++)
+        {
+            for(int j=0;j<originImage.cols;j++)
+            {
+                output.at<cv::Vec3b>(i,j)[channel]=sqrt(originImage.at<cv::Vec3b>(i,j)[channel])*14;//好吧，说FleetColor赋值多余是在骗你，其实数值还是有设计过的w
+            }
+        }
+        return output;
+    }   
 };

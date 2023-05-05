@@ -43,6 +43,10 @@ namespace test
       imwrite("output/Filter/ÀæÉ³-²ÊÇ¦.jpg",Sketch(image,15,15));
       imwrite("output/Filter/ÀæÉ³-ËØÃè.jpg",Sketch(image,15,15,SketchColorMode::gray));
       imwrite("output/Filter/ÀæÉ³-ÂíÈü¿Ë.jpg",Mask(image,5));
+      imwrite("output/Filter/ÀæÉ³-»³¾É.jpg",Old(image));
+      imwrite("output/Filter/ÀæÉ³-Á÷ÄêÀ¶.jpg",Fleet(image));
+      imwrite("output/Filter/ÀæÉ³-Á÷ÄêÂÌ.jpg",Fleet(image,FleetColor::green));
+      imwrite("output/Filter/ÀæÉ³-Á÷Äêºì.jpg",Fleet(image,FleetColor::red));
    }
 
    void EdgeTest()
