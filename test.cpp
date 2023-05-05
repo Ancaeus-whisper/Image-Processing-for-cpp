@@ -1,7 +1,7 @@
 #include "opencv.hpp"
 #include "Module.hpp"
 #include "PostProcess.cpp"
-#include"EdgeDetection.cpp"
+
 using namespace image_lib;
 //写一些测试用例
 namespace test
@@ -23,6 +23,8 @@ namespace test
       imwrite("output/SolidColor/蓝色.jpg",CreateSolidColorImage(500,500,0,0,255));
       imwrite("output/SolidColor/绿色.jpg",CreateSolidColorImage(500,500,0,255,0));
       imwrite("output/SolidColor/红色.jpg",CreateSolidColorImage(500,500,255,0,0));
+
+      imwrite("output/SolidColor/渐变.jpg",GradientColor(cv::Scalar(255,82,95),cv::Scalar(85,72,209),cv::Scalar(255,82,95),1,500,500));
    }
 
    void SaltTest()
@@ -47,6 +49,8 @@ namespace test
       imwrite("output/Filter/梨沙-流年蓝.jpg",Fleet(image));
       imwrite("output/Filter/梨沙-流年绿.jpg",Fleet(image,FleetColor::green));
       imwrite("output/Filter/梨沙-流年红.jpg",Fleet(image,FleetColor::red));
+      imwrite("output/Filter/梨沙-OneLastKiss.jpg",OneLastKiss(image));
+      imwrite("output/Filter/梨沙-OneLastKissReverse.jpg",OneLastKiss(image,OneLastKissMode::reverse));
    }
 
    void EdgeTest()

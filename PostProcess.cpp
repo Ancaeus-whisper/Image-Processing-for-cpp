@@ -1,10 +1,12 @@
 #include"opencv.hpp"
 #include"GrayChange.cpp"
+#include"EdgeDetection.cpp"
 #include<random>
 namespace image_lib
 {
     enum SketchColorMode{color,gray};
     enum FleetColor{green,red,blue};//赋值这一步属于多此一举，仅作提醒作用
+    enum OneLastKissMode{normal,reverse};
     /*
     功能：将图片变为毛玻璃特效
     约束：
@@ -185,4 +187,49 @@ namespace image_lib
         }
         return output;
     }   
+
+    cv::Mat OneLastKiss(const cv::Mat &originImage,OneLastKissMode mode=OneLastKissMode::normal)//整活部分来咯
+    {
+        cv::Mat edgeImage; 
+        cv::Mat output(originImage.rows,originImage.cols,CV_8UC3);
+        
+        CannyEdgeDetection(originImage,edgeImage,50,150);//边缘提取
+        cv::Mat sketch=Sketch(originImage,15,15,gray);
+        // 绘制渐变矩形
+        cv::Mat gradient(edgeImage.rows, edgeImage.cols, CV_8UC3,cv::Scalar(0,0,0));
+        double m=1.0;//渐变方向的斜率
+        double b=0.0;
+        
+        //生成渐变图，要实现颜色过渡需要使用插值算法
+        gradient=GradientColor(cv::Scalar(255,82,95),cv::Scalar(85,72,209),cv::Scalar(255,82,95),1,edgeImage.rows, edgeImage.cols);
+        
+        // 将渐变矩形与边缘提取图像进行混合
+        
+        for (int i = 0; i < sketch.rows; i++)
+        {
+            for (int j = 0; j < sketch.cols; j++)
+            {
+                
+                if(mode==OneLastKissMode::normal)
+                {
+                    if (edgeImage.at<uchar>(i, j) > 0)
+                    {
+                        float alpha = static_cast<float>(edgeImage.at<uchar>(i, j)) / 255.0f;
+                        output.at<cv::Vec3b>(i, j)[0] = (1 - alpha) * output.at<cv::Vec3b>(i, j)[0] + alpha  * gradient.at<cv::Vec3b>(i, j)[0];
+                        output.at<cv::Vec3b>(i, j)[1] = (1 - alpha) * output.at<cv::Vec3b>(i, j)[1] + alpha  * gradient.at<cv::Vec3b>(i, j)[1];
+                        output.at<cv::Vec3b>(i, j)[2] = (1 - alpha) * output.at<cv::Vec3b>(i, j)[2] + alpha  * gradient.at<cv::Vec3b>(i, j)[2];
+                    }
+                }
+                else if(mode==OneLastKissMode::reverse){
+                    if (sketch.at<cv::Vec3b>(i, j)[0] == 255)
+                    {
+                        output.at<cv::Vec3b>(i, j)[0] = (1 - sketch.at<cv::Vec3b>(i, j)[0]/255.0f) * output.at<cv::Vec3b>(i, j)[0] + sketch.at<cv::Vec3b>(i, j)[0]/255.0f  * gradient.at<cv::Vec3b>(i, j)[0];
+                        output.at<cv::Vec3b>(i, j)[1] = (1 - sketch.at<cv::Vec3b>(i, j)[1]/255.0f) * output.at<cv::Vec3b>(i, j)[1] + sketch.at<cv::Vec3b>(i, j)[1]/255.0f  * gradient.at<cv::Vec3b>(i, j)[1];
+                        output.at<cv::Vec3b>(i, j)[2] = (1 - sketch.at<cv::Vec3b>(i, j)[2]/255.0f) * output.at<cv::Vec3b>(i, j)[2] + sketch.at<cv::Vec3b>(i, j)[2]/255.0f  * gradient.at<cv::Vec3b>(i, j)[2];
+                    }
+                }
+            }
+        }
+        return output;
+    }
 };
