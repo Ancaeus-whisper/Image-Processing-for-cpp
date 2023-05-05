@@ -1,7 +1,7 @@
 #include "opencv.hpp"
-#include"GrayChange.cpp"
 #include "Module.hpp"
-#include "Filters.cpp"
+#include "PostProcess.cpp"
+#include"EdgeDetection.cpp"
 using namespace image_lib;
 //写一些测试用例
 namespace test
@@ -10,10 +10,12 @@ namespace test
    {
        cv::Mat image;   //创建一个空图像image
 	   image = cv::imread("1.jpg");  //读取文件夹中的图像
-
+      cv::Mat output;
+      Decolor(image,output);
 	   imwrite("output/GrayChange/梨沙_反转变换.jpg", GrayscaleChange(image,grayscaleChangeMode::Reverse));
 	   imwrite("output/GrayChange/梨沙_对数变换.jpg", GrayscaleChange(image,grayscaleChangeMode::Logarithmic));
 	   imwrite("output/GrayChange/梨沙_伽玛变换.jpg", GrayscaleChange(image,grayscaleChangeMode::Gamma));
+      imwrite("output/GrayChange/梨沙_去色.jpg",output);
    }
 
    void SolidColorTest()
@@ -37,5 +39,20 @@ namespace test
       cv::Mat image=cv::imread("1.jpg");
 
       imwrite("output/Filter/梨沙-毛玻璃.jpg",Glass(image));
+      imwrite("output/Filter/梨沙-浮雕.jpg",Relief(image));
+      imwrite("output/Filter/梨沙-彩铅.jpg",Sketch(image,15,15));
+      imwrite("output/Filter/梨沙-素描.jpg",Sketch(image,15,15,SketchColorMode::gray));
+      imwrite("output/Filter/梨沙-马赛克.jpg",Mask(image,5));
+   }
+
+   void EdgeTest()
+   {
+      //case1
+      cv::Mat image=cv::imread("1.jpg");
+      cv::Mat dstImage1,dstImage2;
+      CannyEdgeDetection(image,dstImage1,50,150);
+      GaussFilter(image,dstImage2,9,1);
+      imwrite("output/EdgeDetection/梨沙-边缘检测.jpg",dstImage1);
+      imwrite("output/EdgeDetection/梨沙-高斯滤波.jpg",dstImage2);
    }
 };

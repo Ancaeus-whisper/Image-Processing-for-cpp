@@ -1,14 +1,36 @@
 #include "Module.hpp"
 namespace image_lib{
 enum grayscaleChangeMode{Reverse,Logarithmic,Gamma};
-    
-    
+    /*
+    功能：去色，本函数采用平均值法
+    约束：
+      输入：原图片(Mat)，写入图片(Mat)，输出：不提供输出
+    */
+    void Decolor(const cv::Mat &originImage,cv::Mat &output)
+    {
+      int rows = originImage.rows;
+      int cols = originImage.cols;
+      output.create(rows, cols, CV_8UC3);
+
+      // 计算各像素的最高值
+      for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            int max = 0;
+            for (int k = 0; k < output.channels(); k++) {
+                max = std::max(max, (int)originImage.at<cv::Vec3b>(i, j)[k]);
+            }
+            for (int k = 0; k < output.channels(); k++) {
+                output.at<cv::Vec3b>(i, j)[k] = max;
+            }
+        }
+    }
+    }
     /*
     功能：执行灰度变换，支持反转变换，对数变换和伽马变换
     约束：
       输入：原图片(Mat)，格式（enum），输出：结果（Mat）
     */
-    cv::Mat GrayscaleChange(cv::Mat originImage,grayscaleChangeMode mode=grayscaleChangeMode::Gamma)
+    cv::Mat GrayscaleChange(const cv::Mat &originImage,grayscaleChangeMode mode=grayscaleChangeMode::Gamma)
     {
       if(originImage.empty())
       {
